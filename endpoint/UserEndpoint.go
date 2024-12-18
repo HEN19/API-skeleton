@@ -1,11 +1,15 @@
 package endpoint
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/api-skeleton/service/UserService"
+)
 
 func RegistrationEndpoint(response http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case "POST":
-		// UserService.UserRegistration(response, request)
+		UserService.UserRegistration(response, request)
 		break
 	}
 }

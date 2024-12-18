@@ -1,4 +1,4 @@
-package constant
+package constanta
 
 const CodeSuccessResponse = 200
 const CodeBadRequestResponse = 400
