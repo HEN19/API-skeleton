@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/api-skeleton/dto/in"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 )
 
@@ -31,10 +32,12 @@ func readBody(request *http.Request) (output string) {
 	return string(byteBody)
 }
 
-func GetUserBody(request *http.Request) (bodyRequest in.UserRequest) {
-	jsonString := readBody(request)
-	json.Unmarshal([]byte(jsonString), &bodyRequest)
-	return
+func GetUserBody(c *gin.Context) (in.UserRequest, error) {
+	var userRequest in.UserRequest
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
+		return userRequest, err
+	}
+	return userRequest, nil
 }
 
 func ReadParam(request *http.Request) (id int64, err error) {

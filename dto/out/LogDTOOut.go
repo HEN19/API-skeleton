@@ -1,10 +1,8 @@
 package out
 
 import (
-	"encoding/json"
-	"net/http"
-
 	"github.com/api-skeleton/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type APIResponse struct {
@@ -18,17 +16,26 @@ type APIMessage struct {
 	Content interface{} `json:"content"`
 }
 
+// String converts the APIResponse to a JSON string.
 func (ar APIResponse) String() string {
 	return utils.StructToJSON(ar)
 }
 
-func ResponseOut(response http.ResponseWriter, data interface{}, success bool, code int, message string) {
-	response.Header().Set("Content-type", "application/json")
-	var apiResponse APIResponse
-	apiResponse.API.Success = success
-	apiResponse.API.Code = code
-	apiResponse.API.Message = message
-	apiResponse.API.Content = data
-	response.WriteHeader(code)
-	json.NewEncoder(response).Encode(apiResponse)
+// ResponseOut sends a structured JSON response using Gin context.
+func ResponseOut(c *gin.Context, data interface{}, success bool, code int, message string) {
+	// Set the Content-Type header
+	c.Header("Content-Type", "application/json")
+
+	// Create the response structure
+	apiResponse := APIResponse{
+		API: APIMessage{
+			Success: success,
+			Code:    code,
+			Message: message,
+			Content: data,
+		},
+	}
+
+	// Send the response with the appropriate HTTP status code
+	c.JSON(code, apiResponse)
 }

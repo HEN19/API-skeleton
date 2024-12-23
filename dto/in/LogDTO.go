@@ -28,7 +28,7 @@ func (input *UserRequest) ValidationRegistration() error {
 		return errors.New("last name is required")
 	}
 
-	if input.Gender != "L" && input.Gender != "P" {
+	if input.Gender != "L" || input.Gender != "P" {
 		return errors.New("gender is required, Only L/P is allowed")
 
 	}
