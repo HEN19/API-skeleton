@@ -8,6 +8,7 @@ import (
 	"github.com/api-skeleton/dto/out"
 	"github.com/api-skeleton/model"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 var jwtKey = []byte("API-")
@@ -55,19 +56,24 @@ func ValidateToken(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := r.Header.Get("Authorization")
+// AuthMiddleware is the middleware to validate JWT tokens.
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
 
+		tokenString := c.GetHeader("Authorization")
+		// Validate the token
 		_, err := ValidateToken(tokenString)
 		if err != nil {
-			out.ResponseOut(w, nil, false, http.StatusUnauthorized, "Unauthorized")
-			http.Error(w, "", http.StatusUnauthorized)
+			// Respond with Unauthorized status using the ResponseOut function
+			out.ResponseOut(c, nil, false, http.StatusUnauthorized, "Unauthorized")
+			// Stop further processing
+			c.Abort()
 			return
 		}
 
-		next.ServeHTTP(w, r)
-	})
+		// Proceed to the next handler
+		c.Next()
+	}
 }
 
 func DecodeToken(tokenString string) (*Claims, error) {

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/api-skeleton/config"
 	"github.com/api-skeleton/routes"
@@ -21,6 +19,6 @@ func main() {
 	controller := routes.Controller()
 
 	//log
-	fmt.Println("Application Running in Port : 8080")
-	log.Fatal(http.ListenAndServe(":8080", controller))
+	// fmt.Println("Application Running in Port : 8080")
+	log.Fatal(controller.Run(":8080"))
 }
