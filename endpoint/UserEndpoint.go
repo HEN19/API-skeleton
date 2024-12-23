@@ -1,8 +1,6 @@
 package endpoint
 
 import (
-	"net/http"
-
 	"github.com/api-skeleton/service/UserService"
 	"github.com/gin-gonic/gin"
 )
@@ -25,13 +23,13 @@ func RegistrationEndpoint(c *gin.Context) {
 	}
 
 }
-func UserUpdateEndpoint(response http.ResponseWriter, request *http.Request) {
-	switch request.Method {
+func UserWithParamEndpoint(c *gin.Context) {
+	switch c.Request.Method {
 	case "PUT":
 		// UserService.UserProfileUpdate(response, request)
 		break
 	case "GET":
-		// UserService.GetUserProfile(response, request)
+		UserService.GetUserProfile(c)
 		break
 	}
 }
