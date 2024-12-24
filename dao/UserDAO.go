@@ -64,3 +64,23 @@ func (input userDAO) LoginCheck(db *sql.DB, user model.UserModel) (result model.
 
 	return
 }
+
+func (input userDAO) GetUserProfile(db *sql.DB, id int64) (model.UserModel, error) {
+	query := "SELECT first_name, last_name, gender, phone, email, address, created_at, updated_at " +
+		"FROM " + input.TableName + " WHERE id = ?"
+
+	row := db.QueryRow(query, id)
+	var user model.UserModel
+
+	err := row.Scan(&user.FirstName, &user.LastName,
+		&user.Gender, &user.Telephone, &user.Email, &user.Address,
+		&user.CreatedAt, &user.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, nil
+		}
+		return user, err
+	}
+	return user, nil
+}

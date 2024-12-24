@@ -17,6 +17,7 @@ func Controller() *gin.Engine {
 	{
 		user.POST("/register", endpoint.RegistrationEndpoint)
 		user.POST("/login", endpoint.LoginEndpoint)
+		user.GET("/profile", endpoint.UserWithParamEndpoint)
 	}
 
 	// user := routes.PathPrefix("/user").Subrouter()
