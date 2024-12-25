@@ -5,6 +5,7 @@ import (
 
 	"github.com/api-skeleton/config"
 	"github.com/api-skeleton/constanta"
+	"github.com/api-skeleton/constanta/ErrorModel"
 	"github.com/api-skeleton/utils"
 	"github.com/gin-gonic/gin"
 
@@ -19,7 +20,14 @@ func UserRegistration(c *gin.Context) {
 	// Get the user body from the request
 	userRequest, err := utils.GetUserBody(c)
 	if err != nil {
-		out.ResponseOut(c, nil, false, constanta.CodeBadRequestResponse, "Invalid request body")
+		c.JSON(constanta.CodeBadRequestResponse, ErrorModel.ErrorInternalServerError(c, err.Error()))
+		return
+	}
+
+	// Perform validation before mapping
+	errValidation := userRequest.ValidationRegistration(c)
+	if errValidation.Code != constanta.CodeSuccessResponse {
+		c.JSON(errValidation.Code, errValidation)
 		return
 	}
 
@@ -33,7 +41,7 @@ func UserRegistration(c *gin.Context) {
 	// Insert user into DB
 	err = dao.UserDAO.InsertUser(db, reqBody)
 	if err != nil {
-		out.ResponseOut(c, nil, false, constanta.CodeInternalServerErrorResponse, constanta.ErrorInternalDB)
+		c.JSON(constanta.CodeInternalServerErrorResponse, ErrorModel.ErrorInternalServerError(c, err.Error()))
 		return
 	}
 
@@ -41,20 +49,8 @@ func UserRegistration(c *gin.Context) {
 	out.ResponseOut(c, nil, true, constanta.CodeSuccessResponse, constanta.SuccessRegistrationData)
 }
 
-// getUserBody parses the request body into a UserRequest struct.
-func getUserBody(c *gin.Context) (in.UserRequest, error) {
-	var userRequest in.UserRequest
-	if err := c.ShouldBindJSON(&userRequest); err != nil {
-		return userRequest, err
-	}
-	return userRequest, nil
-}
-
 // mapToUserModel maps the UserRequest to UserModel, performing validation if needed.
 func mapToUserModel(reqBody in.UserRequest) model.UserModel {
-	// Perform validation before mapping
-	reqBody.ValidationRegistration()
-
 	// Map to model
 	return model.UserModel{
 		ID:        sql.NullInt64{Int64: reqBody.Id},

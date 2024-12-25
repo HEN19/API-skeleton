@@ -28,7 +28,7 @@ func (input userDAO) InsertUser(db *sql.DB, inputStruct model.UserModel) (err er
 		`
 			INSERT INTO %s
 				(username, password, first_name, last_name, gender, phone, email, address)
-			VALUES (?,?,?,?,?,?,?,?)
+			VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
 		`, input.TableName,
 	)
 
@@ -50,7 +50,7 @@ func (input userDAO) InsertUser(db *sql.DB, inputStruct model.UserModel) (err er
 func (input userDAO) LoginCheck(db *sql.DB, user model.UserModel) (result model.UserModel, err error) {
 	query := "SELECT id, username, first_name, last_name " +
 		" FROM " + input.TableName +
-		" WHERE username = ? AND password = ? "
+		" WHERE username = $1 AND password = $2 "
 
 	param := []interface{}{user.Username.String, user.Password.String}
 
@@ -67,7 +67,7 @@ func (input userDAO) LoginCheck(db *sql.DB, user model.UserModel) (result model.
 
 func (input userDAO) GetUserProfile(db *sql.DB, id int64) (model.UserModel, error) {
 	query := "SELECT first_name, last_name, gender, phone, email, address, created_at, updated_at " +
-		"FROM " + input.TableName + " WHERE id = ?"
+		"FROM " + input.TableName + " WHERE id = $1"
 
 	row := db.QueryRow(query, id)
 	var user model.UserModel
