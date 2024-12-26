@@ -1,8 +1,10 @@
 package in
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/api-skeleton/constanta/ErrorModel"
+	"github.com/gin-gonic/gin"
 )
 
 type UserRequest struct {
@@ -17,38 +19,36 @@ type UserRequest struct {
 	Address   string `json:"address"`
 }
 
-func (input *UserRequest) ValidationRegistration() error {
+func (input *UserRequest) ValidationRegistration(c *gin.Context) ErrorModel.DynamicErrorResponse {
 
 	// ... validation logic here
 	if input.FirstName == "" {
-		return errors.New("first name is required")
+		return ErrorModel.ErrorInvalidRequest(c, "first_name", "first_name is required")
 	}
 
 	if input.LastName == "" {
-		return errors.New("last name is required")
+		return ErrorModel.ErrorInvalidRequest(c, "last_name", "last_name is required")
 	}
 
-	if input.Gender != "L" || input.Gender != "P" {
-		return errors.New("gender is required, Only L/P is allowed")
+	if input.Gender != "L" && input.Gender != "P" {
+		return ErrorModel.ErrorInvalidRequest(c, "gender", "gender must be L (Laki-Laki) or P (Perempuan)")
 
 	}
 
 	if input.Email != fmt.Sprintf("%s@%s", input.Username, "gmail.com") {
-		return errors.New("email is required, use these format username@domain")
+		return ErrorModel.ErrorInvalidRequest(c, "email", "email must be valid")
 	}
 
 	return input.mandatoryValidation()
 }
 
-func (input *UserRequest) mandatoryValidation() (err error) {
+func (input *UserRequest) mandatoryValidation() ErrorModel.DynamicErrorResponse {
 	if input.Username == "" {
-		err = errors.New("Username is required")
-		return
+		return ErrorModel.ErrorInvalidRequest(nil, "username", "username is required")
 	}
 	if input.Password == "" {
-		err = errors.New("Password is required")
-		return
+		ErrorModel.ErrorInvalidRequest(nil, "username", "username is required")
 	}
 
-	return
+	return ErrorModel.NonErrorResponse()
 }

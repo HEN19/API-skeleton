@@ -10,4 +10,6 @@ const SuccessEditData = "Berhasil Mengubah Data"
 const SuccessDeleteData = "Berhasil Menghapus Data"
 const SuccessGetData = "Berhasil Mengambil Data"
 const SuccessRegistrationData = "Berhasil Registrasi User"
+
+const ErrorDataUnknown = "Data Tidak Ditemukan"
 const ErrorInternalDB = "Terdapat Error di sistem kami. Harap hubungi Admin"

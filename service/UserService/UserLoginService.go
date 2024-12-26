@@ -23,6 +23,13 @@ func LoginService(c *gin.Context) (err error) {
 	// Get user request body from Gin context
 	userBody, err := utils.GetUserBody(c)
 
+	// Perform validation before mapping
+	errValidation := userBody.ValidationRegistration(c)
+	if errValidation.Code != constanta.CodeSuccessResponse {
+		c.JSON(errValidation.Code, errValidation)
+		return
+	}
+
 	// Map the request body to the repository model
 	userRepo := mapToUserModel(userBody)
 
@@ -30,23 +37,17 @@ func LoginService(c *gin.Context) (err error) {
 	db := config.Connect()
 	defer db.Close()
 
-	// Validate input (Username/Password)
-	if userRepo.Username.String == "" || userRepo.Password.String == "" {
-		out.ResponseOut(c, nil, false, constanta.CodeBadRequestResponse, "Username/Password tidak boleh kosong")
-		return err
-	}
-
 	// Check if the user exists and credentials are correct
 	user, err = dao.UserDAO.LoginCheck(db, userRepo)
 	if err != nil {
-		out.ResponseOut(c, nil, false, constanta.CodeInternalServerErrorResponse, constanta.ErrorInternalDB)
-		return err
+		c.JSON(constanta.CodeBadRequestResponse, constanta.ErrorInternalDB)
+		return
 	}
 
 	// If user not found or invalid credentials
 	if user.ID.Int64 == 0 {
-		out.ResponseOut(c, nil, false, constanta.CodeBadRequestResponse, "Username/Password salah")
-		return err
+		c.JSON(constanta.CodeBadRequestResponse, constanta.ErrorDataUnknown)
+		return
 	}
 
 	// Generate the JWT token for the user
